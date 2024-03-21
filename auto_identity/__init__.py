@@ -6,12 +6,14 @@ including key generation, Auto ID management, and Auto ID registration and verif
 """
 
 from .key_management import generate_rsa_key_pair, generate_ed25519_key_pair, load_private_key, load_public_key
+from .certificate_management import create_csr
 
 __version__ = '0.1.0'
 
 __all__ = [
-    "generate_rsa_key_pair", 
-    "generate_ed25519_key_pair", 
+    "generate_rsa_key_pair",
+    "generate_ed25519_key_pair",
     "load_private_key",
     "load_public_key",
+    "create_csr"
 ]
