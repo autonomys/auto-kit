@@ -7,6 +7,7 @@ including key generation, Auto ID management, and Auto ID registration and verif
 
 from .key_management import generate_rsa_key_pair, generate_ed25519_key_pair, load_private_key, load_public_key
 from .certificate_management import create_csr
+from .utils import keccak_256
 
 __version__ = '0.1.0'
 
@@ -15,5 +16,6 @@ __all__ = [
     "generate_ed25519_key_pair",
     "load_private_key",
     "load_public_key",
-    "create_csr"
+    "create_csr",
+    "keccak_256"
 ]
