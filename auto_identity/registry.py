@@ -1,7 +1,8 @@
 from typing import Optional
 from cryptography import x509
+from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ed25519
-from substrateinterface import Keypair, SubstrateInterface
+from substrateinterface import ExtrinsicReceipt, Keypair, SubstrateInterface, exceptions
 from .utils import keccak_256
 
 
@@ -14,19 +15,49 @@ class Registry():
         self.registry = SubstrateInterface(url=rpc_url)
         self.signer: Optional[Keypair] = signer
 
-    def register(self, certificate: x509.Certificate):
+    def _compose_call(self, call_function: str, call_params: dict) -> Optional[ExtrinsicReceipt]:
+        """Composes an extrinsic and call the registry module."""
+        if self.signer is None:
+            return None
+
+        call = self.registry.compose_call(
+            call_module='auto_id',
+            call_function=call_function,
+            call_params=call_params,
+        )
+
+        extrinsic = self.registry.create_signed_extrinsic(
+            call=call, keypair=self.signer)
+
+        try:
+            return self.registry.submit_extrinsic(extrinsic, wait_for_inclusion=True)
+
+        except exceptions.SubstrateRequestException as e:
+            print("Failed to send: {}".format(e))
+            return None
+
+    def register_auto_id(self, issuer_id, certificate: x509.Certificate):
         """
         Register a certificate in the registry.
 
         :param certificate: Certificate to register.
         """
 
-        # TODO register the certificate in the registry
+        call_params = {
+            "X509": {
+                "issuer_id": issuer_id,
+                "certificate": certificate.tbs_certificate_bytes,
+                # TODO: DER encode?
+                "signature_algorithm": certificate.signature_algorithm_oid,
+                "signature": certificate.signature,
+            }
+        }
 
-        # TODO return receipt
-        return certificate
+        receipt = self._compose_call(
+            call_function="register_auto_id", call_params=call_params)
+        return receipt
 
-    def get_auto_entity(self, subject_name: str):
+    def get_auto_id(self, subject_name: str):
         """
         Get an auto identity from the registry.
 
@@ -55,7 +86,7 @@ class Registry():
         :return: Certificate with the provided subject name.
         """
 
-        entity = self.get_auto_entity(subject_name)
+        entity = self.get_auto_id(subject_name)
 
         if entity is None:
             return False

@@ -59,3 +59,13 @@ def self_issue_certificate(subject_name, private_key, validity_period_days=365):
     certificate = issue_certificate(csr, private_key, validity_period_days)
 
     return certificate
+
+
+def get_subject_common_name(certificate: x509.Certificate):
+    """
+    Retrieves the common name from the subject of the certificate.
+
+    :param certificate: Certificate to retrieve the common name from.
+    :return: Common name of the certificate.
+    """
+    return certificate.subject.get_attributes_for_oid(NameOID.COMMON_NAME)[0].value

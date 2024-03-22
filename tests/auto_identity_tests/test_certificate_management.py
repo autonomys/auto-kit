@@ -86,3 +86,24 @@ def test_self_issue_certificate():
     cert_bytes = certificate.tbs_certificate_bytes
     signature = certificate.signature
     public_key.verify(signature, cert_bytes)
+
+
+def test_get_subject_common_name():
+    # Create a private key for testing
+    private_key, _ = key_management.generate_ed25519_key_pair()
+
+    # Define the subject name for the CSR
+    subject_name = "Test"
+
+    # Call the create_csr function
+    csr = certificate_management.create_csr(subject_name, private_key)
+
+    # Issue a certificate using the CSR
+    certificate = certificate_management.issue_certificate(
+        csr, private_key)
+
+    # Retrieve the common name from the certificate
+    common_name = certificate_management.get_subject_common_name(certificate)
+
+    # Assert that the common name matches the provided subject name
+    assert common_name == subject_name
