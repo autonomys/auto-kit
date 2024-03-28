@@ -1,13 +1,17 @@
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.asymmetric import rsa, ed25519  
+from cryptography.hazmat.primitives.asymmetric import rsa, ed25519
 from cryptography.hazmat.primitives import serialization
 
-def generate_rsa_key_pair(key_size=2048):
+
+def generate_rsa_key_pair(key_size: int = 2048) -> tuple:
     """
     Generates a RSA private and public key pair.
 
-    :param key_size: The size of the key in bits. Default is 2048.
-    :return: RSA private key and public key
+    Args:
+        key_size (int): The size of the key in bits. Default is 2048.
+
+    Returns:
+        tuple: A tuple containing the RSA private key and public key.
     """
     private_key = rsa.generate_private_key(
         public_exponent=65537,
@@ -17,28 +21,28 @@ def generate_rsa_key_pair(key_size=2048):
     public_key = private_key.public_key()
     return private_key, public_key
 
-def generate_ed25519_key_pair():
+
+def generate_ed25519_key_pair() -> tuple:
     """
     Generates an Ed25519 private and public key pair.
 
-    :return: A tuple containing the Ed25519 private key and public key.
+    Returns:
+        tuple: A tuple containing the Ed25519 private key and public key.
     """
-    # Generate the private key
     private_key = ed25519.Ed25519PrivateKey.generate()
-
-    # Derive the public key from the private key
     public_key = private_key.public_key()
-
     return private_key, public_key
 
-def save_key(key, file_path, password=None):
+
+def save_key(key, file_path: str, password: str = None) -> None:
     """
     Saves a private or public key to a file. If it's a private key and a password is provided,
     the key will be encrypted.
 
-    :param key: The key to save (private or public).
-    :param file_path: Path to the file where the key should be saved.
-    :param password: Optional password to encrypt the private key.
+    Args:
+        key: The key to save (private or public).
+        file_path (str): Path to the file where the key should be saved.
+        password (str): Optional password to encrypt the private key.
     """
     if hasattr(key, 'private_bytes'):
         encoding = serialization.Encoding.PEM
@@ -54,13 +58,17 @@ def save_key(key, file_path, password=None):
     with open(file_path, "wb") as key_file:
         key_file.write(key_data)
 
-def load_private_key(file_path, password=None):
+
+def load_private_key(file_path: str, password: str = None):
     """
     Loads a private key from a file. If the file is encrypted, a password must be provided.
 
-    :param file_path: Path to the private key file.
-    :param password: The password used to encrypt the key file.
-    :return: The private key.
+    Args:
+        file_path (str): Path to the private key file.
+        password (str): The password used to encrypt the key file.
+
+    Returns:
+        The private key.
     """
     with open(file_path, "rb") as key_file:
         private_key = serialization.load_pem_private_key(
@@ -70,12 +78,16 @@ def load_private_key(file_path, password=None):
         )
     return private_key
 
-def load_public_key(file_path):
+
+def load_public_key(file_path: str):
     """
     Loads a public key from a file.
 
-    :param file_path: Path to the public key file.
-    :return: The public key.
+    Args:
+        file_path (str): Path to the public key file.
+
+    Returns:
+        The public key.
     """
     with open(file_path, "rb") as key_file:
         public_key = serialization.load_pem_public_key(

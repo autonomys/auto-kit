@@ -12,11 +12,27 @@ class Registry():
     """
 
     def __init__(self, rpc_url: str = "ws://127.0.0.1:9944", signer=None):
+        """
+        Initialize the Registry class.
+
+        Args:
+            rpc_url (str): The URL of the RPC server.
+            signer (Keypair): The signer keypair.
+        """
         self.registry = SubstrateInterface(url=rpc_url)
         self.signer: Optional[Keypair] = signer
 
     def _compose_call(self, call_function: str, call_params: dict) -> Optional[ExtrinsicReceipt]:
-        """Composes an extrinsic and call the registry module."""
+        """
+        Composes an extrinsic and calls the registry module.
+
+        Args:
+            call_function (str): The name of the call function.
+            call_params (dict): The parameters for the call function.
+
+        Returns:
+            Optional[ExtrinsicReceipt]: The receipt of the extrinsic if successful, None otherwise.
+        """
         if self.signer is None:
             return None
 
@@ -40,9 +56,13 @@ class Registry():
         """
         Register a certificate in the registry.
 
-        :param certificate: Certificate to register.
-        """
+        Args:
+            issuer_id: The issuer ID.
+            certificate (x509.Certificate): The certificate to register.
 
+        Returns:
+            Optional[ExtrinsicReceipt]: The receipt of the extrinsic if successful, None otherwise.
+        """
         call_params = {
             "X509": {
                 "issuer_id": issuer_id,
@@ -61,10 +81,12 @@ class Registry():
         """
         Get an auto identity from the registry.
 
-        :param subject_name: Subject name of the certificate.
-        :return: Certificate with the provided subject name.
-        """
+        Args:
+            subject_name (str): The subject name of the certificate.
 
+        Returns:
+            The auto entity with the provided subject name.
+        """
         # TODO in demo-chain app identifiers were keccak_256 hashes of the subject name,
         # we may not keep this convention
         identifier = keccak_256(subject_name.encode())
@@ -80,12 +102,15 @@ class Registry():
 
     def verify(self, subject_name: str, public_key: ed25519.Ed25519PublicKey):
         """
-        Get a certificate from the registry.
+        Verify a certificate from the registry.
 
-        :param subject_name: Subject name of the certificate.
-        :return: Certificate with the provided subject name.
+        Args:
+            subject_name (str): The subject name of the certificate.
+            public_key (ed25519.Ed25519PublicKey): The public key to verify.
+
+        Returns:
+            bool: True if the certificate is valid, False otherwise.
         """
-
         entity = self.get_auto_id(subject_name)
 
         if entity is None:
