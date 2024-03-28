@@ -1,9 +1,8 @@
 from typing import Optional
 from cryptography import x509
-from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ed25519
 from substrateinterface import ExtrinsicReceipt, Keypair, SubstrateInterface, exceptions
-from .utils import keccak_256
+from .utils import der_encode_signature_algorithm_oid, keccak_256
 
 
 class Registry():
@@ -67,8 +66,7 @@ class Registry():
             "X509": {
                 "issuer_id": issuer_id,
                 "certificate": certificate.tbs_certificate_bytes,
-                # TODO: DER encode?
-                "signature_algorithm": certificate.signature_algorithm_oid,
+                "signature_algorithm": der_encode_signature_algorithm_oid(certificate.signature_algorithm_oid),
                 "signature": certificate.signature,
             }
         }
@@ -77,7 +75,7 @@ class Registry():
             call_function="register_auto_id", call_params=call_params)
         return receipt
 
-    def get_auto_id(self, subject_name: str):
+    def get_auto_id(self, identifier):
         """
         Get an auto identity from the registry.
 
@@ -87,10 +85,8 @@ class Registry():
         Returns:
             The auto entity with the provided subject name.
         """
-        # TODO in demo-chain app identifiers were keccak_256 hashes of the subject name,
-        # we may not keep this convention
-        identifier = keccak_256(subject_name.encode())
-        result = self.registry.query('Registry', 'AutoID', [identifier])
+
+        result = self.registry.query('auto-id', 'AutoIds', [identifier])
 
         if result is None:
             return None
