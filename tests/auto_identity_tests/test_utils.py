@@ -1,14 +1,7 @@
 import pathlib
 from cryptography.hazmat.backends import default_backend
 from cryptography import x509
-from auto_identity import keccak_256, der_encode_signature_algorithm_oid
-
-
-def test_keccak_256():
-    data = b"hello"
-    result = keccak_256(data)
-    # https://emn178.github.io/online-tools/keccak_256.html?input_type=utf-8&input=hello
-    assert result == "1c8aff950685c2ed4bc3174f3472287b56d9517b9c948127319a09a7a36deac8"
+from auto_identity import der_encode_signature_algorithm_oid
 
 
 def test_der_encode_algorithm2():

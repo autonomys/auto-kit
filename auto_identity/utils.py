@@ -1,22 +1,6 @@
-import sha3
 from cryptography.x509.oid import ObjectIdentifier
 from pyasn1.type import namedtype, univ
 from pyasn1.codec.der.encoder import encode
-
-
-def keccak_256(data: bytes) -> str:
-    """
-    Compute the Keccak-256 hash of the input data.
-
-    Args:
-        data (bytes): Input data to hash.
-
-    Returns:
-        str: Keccak-256 hash of the input data.
-    """
-
-    result = sha3.keccak_256(data)
-    return result.hexdigest()
 
 
 class AlgorithmIdentifier(univ.Sequence):
