@@ -11,7 +11,7 @@ from .certificate_management import create_csr, issue_certificate, self_issue_ce
 from .registry import Registry
 from .utils import der_encode_signature_algorithm_oid
 
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 __all__ = [
     "generate_rsa_key_pair",
