@@ -95,3 +95,31 @@ def load_public_key(file_path: str):
             backend=default_backend()
         )
     return public_key
+
+
+def key_to_hex(key) -> str:
+    """
+    Converts a private or public key to a hex string.
+
+    Args:
+        key: The key to convert (private or public).
+
+    Returns:
+        str: The hex string representation of the key.
+    """
+    key_data = b''
+    if hasattr(key, 'private_bytes'):
+        # For private keys
+        encoding = serialization.Encoding.DER
+        format = serialization.PrivateFormat.PKCS8
+        encryption_algorithm = serialization.NoEncryption()
+        key_data = key.private_bytes(encoding, format, encryption_algorithm)
+    elif hasattr(key, 'public_bytes'):
+        # For public keys
+        encoding = serialization.Encoding.DER
+        format = serialization.PublicFormat.SubjectPublicKeyInfo
+        key_data = key.public_bytes(encoding, format)
+    else:
+        raise ValueError("Unsupported key type")
+
+    return key_data.hex()
