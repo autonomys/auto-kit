@@ -1,7 +1,6 @@
 import os
 from dotenv import load_dotenv
-from substrateinterface import Keypair
-from auto_identity import generate_ed25519_key_pair, self_issue_certificate, Registry
+from auto_identity import generate_ed25519_key_pair, self_issue_certificate, Registry, Keypair
 
 
 # Configuration
