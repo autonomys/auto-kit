@@ -2,7 +2,7 @@ from typing import Optional
 from cryptography import x509
 from cryptography.hazmat.primitives.asymmetric import ed25519
 from substrateinterface import ExtrinsicReceipt, Keypair, SubstrateInterface, exceptions
-from .utils import der_encode_signature_algorithm_oid, keccak_256
+from .utils import der_encode_signature_algorithm_oid
 
 
 class Registry():
@@ -36,7 +36,7 @@ class Registry():
             return None
 
         call = self.registry.compose_call(
-            call_module='auto_id',
+            call_module='AutoId',
             call_function=call_function,
             call_params=call_params,
         )
@@ -51,28 +51,37 @@ class Registry():
             print("Failed to send: {}".format(e))
             return None
 
-    def register_auto_id(self, issuer_id, certificate: x509.Certificate):
+    def register_auto_id(self, certificate: x509.Certificate, issuer_id=None):
         """
         Register a certificate in the registry.
 
-        Args:
-            issuer_id: The issuer ID.
+        Args:            
             certificate (x509.Certificate): The certificate to register.
+            issuer_id: The issuer ID. If None, the ID will be self-issued.
 
         Returns:
             Optional[ExtrinsicReceipt]: The receipt of the extrinsic if successful, None otherwise.
         """
-        call_params = {
-            "X509": {
-                "issuer_id": issuer_id,
-                "certificate": certificate.tbs_certificate_bytes,
-                "signature_algorithm": der_encode_signature_algorithm_oid(certificate.signature_algorithm_oid),
-                "signature": certificate.signature,
-            }
+
+        base_certificate = {
+            "certificate": certificate.tbs_certificate_bytes,
+            "signature_algorithm": der_encode_signature_algorithm_oid(certificate.signature_algorithm_oid),
+            "signature": certificate.signature,
         }
+        if issuer_id is None:
+            certificate_param = {"Root": base_certificate}
+        else:
+            certificate_param = {
+                "Leaf": {
+                    "issuer_id": issuer_id,
+                    **base_certificate,
+                }
+            }
+
+        req = {"req": {"X509": certificate_param}}
 
         receipt = self._compose_call(
-            call_function="register_auto_id", call_params=call_params)
+            call_function="register_auto_id", call_params=req)
         return receipt
 
     def get_auto_id(self, identifier):
