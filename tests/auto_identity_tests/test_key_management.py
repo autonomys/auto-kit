@@ -1,6 +1,7 @@
 from auto_identity import key_management
 import os
 import tempfile
+from cryptography.hazmat.primitives import serialization
 
 
 def test_generate_rsa_key_pair():
@@ -24,10 +25,22 @@ def test_save_and_load_key():
 
     # Assuming save_key and load_private_key are implemented
     from auto_identity.key_management import save_key, load_private_key
-    save_key(private_key, file_path, password="secret")
 
+    save_key(private_key, file_path, password="secret")
     loaded_key = load_private_key(file_path, password="secret")
-    assert loaded_key is not None
+
+    private_key_pem = private_key.private_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PrivateFormat.PKCS8,
+        encryption_algorithm=serialization.NoEncryption()
+    )
+    loaded_key_pem = loaded_key.private_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PrivateFormat.PKCS8,
+        encryption_algorithm=serialization.NoEncryption()
+    )
+
+    assert private_key_pem == loaded_key_pem
 
     # Clean up
     os.remove(file_path)

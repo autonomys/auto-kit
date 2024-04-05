@@ -32,6 +32,8 @@ def test_issue_certificate():
     # Create a private key for testing
     subject_private_key, subject_public_key = key_management.generate_ed25519_key_pair()
     issuer_private_key, issuer_public_key = key_management.generate_ed25519_key_pair()
+    issuer_certificate = certificate_management.self_issue_certificate(
+        "issuer", issuer_private_key)
 
     # Define the subject name for the certificate
     subject_name = "Test"
@@ -41,7 +43,7 @@ def test_issue_certificate():
 
     # Issue a certificate using the CSR
     certificate = certificate_management.issue_certificate(
-        csr, issuer_private_key)
+        csr, issuer_certificate, issuer_private_key)
 
     # Assert that the certificate is not None
     assert certificate is not None
@@ -91,16 +93,11 @@ def test_self_issue_certificate():
 def test_get_subject_common_name():
     # Create a private key for testing
     private_key, _ = key_management.generate_ed25519_key_pair()
-
-    # Define the subject name for the CSR
     subject_name = "Test"
 
-    # Call the create_csr function
-    csr = certificate_management.create_csr(subject_name, private_key)
-
     # Issue a certificate using the CSR
-    certificate = certificate_management.issue_certificate(
-        csr, private_key)
+    certificate = certificate_management.self_issue_certificate(
+        subject_name, private_key)
 
     # Retrieve the common name from the certificate
     common_name = certificate_management.get_subject_common_name(certificate)

@@ -41,6 +41,9 @@ def key_to_pem(key, password: str = None) -> str:
     Args:
         key: The key to convert (private or public).
         password (str): The password used to encrypt the key.
+
+    Returns:
+            str: The PEM string representation of the key.
     """
     if hasattr(key, 'private_bytes'):
         encoding = serialization.Encoding.PEM
@@ -79,7 +82,13 @@ def pem_to_private_key(pem_data: str, password: str = None):
     Args:
         pem_data (str): The PEM string to convert.
         password (str): The password used to encrypt the key.
+
+    Returns:
+        The private key.
     """
+    # Ensure pem_data is a bytes object
+    if isinstance(pem_data, str):
+        pem_data = pem_data.encode()
 
     private_key = serialization.load_pem_private_key(
         pem_data,
@@ -111,6 +120,9 @@ def pem_to_public_key(pem_data: str):
 
     Args:
         pem_data (str): The PEM string to convert.
+
+    Returns:
+        The public key.
     """
     public_key = serialization.load_pem_public_key(
         pem_data,
@@ -160,3 +172,27 @@ def key_to_hex(key) -> str:
         raise ValueError("Unsupported key type")
 
     return key_data.hex()
+
+
+def do_public_keys_match(public_key_1, public_key_2):
+    """
+    Checks if two public keys match.
+
+    Args:
+        public_key_1: The first public key.
+        public_key_2: The second public key.
+
+    Returns:
+            bool: True if the keys match, False otherwise.
+    """
+    # Serialize public keys to DER format for comparison
+    public_key_1_der = public_key_1.public_bytes(
+        encoding=serialization.Encoding.DER,
+        format=serialization.PublicFormat.SubjectPublicKeyInfo
+    )
+
+    public_key_2_der = public_key_2.public_bytes(
+        encoding=serialization.Encoding.DER,
+        format=serialization.PublicFormat.SubjectPublicKeyInfo
+    )
+    return public_key_1_der == public_key_2_der
