@@ -16,11 +16,11 @@ from .key_management import (
     pem_to_public_key,
     load_public_key,
     save_key)
-from .certificate_management import create_csr, issue_certificate, self_issue_certificate, get_subject_common_name
+from .certificate_manager import CertificateManager
 from .registry import Registry
 from .utils import der_encode_signature_algorithm_oid
 
-__version__ = '0.1.2'
+__version__ = '0.1.3'
 
 __all__ = [
     "generate_rsa_key_pair",
@@ -32,10 +32,7 @@ __all__ = [
     "pem_to_private_key",
     "pem_to_public_key",
     "key_to_pem",
-    "create_csr",
-    "issue_certificate",
-    "self_issue_certificate",
-    "get_subject_common_name",
+    "CertificateManager",
     "der_encode_signature_algorithm_oid",
     "Registry",
     "Keypair",

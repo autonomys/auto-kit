@@ -3,3 +3,4 @@ substrate-interface==1.7.7
 pyasn1==0.6.0
 python-dotenv==1.0.1
 wheel==0.43.0
+pytest==8.1.1
