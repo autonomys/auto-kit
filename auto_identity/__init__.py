@@ -16,7 +16,7 @@ from .key_management import (
     pem_to_public_key,
     load_public_key,
     save_key)
-from .certificate_management import CertificateManager
+from .certificate_manager import CertificateManager
 from .registry import Registry
 from .utils import der_encode_signature_algorithm_oid
 
