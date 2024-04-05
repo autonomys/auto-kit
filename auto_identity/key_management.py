@@ -34,15 +34,13 @@ def generate_ed25519_key_pair() -> tuple:
     return private_key, public_key
 
 
-def save_key(key, file_path: str, password: str = None) -> None:
+def key_to_pem(key, password: str = None) -> str:
     """
-    Saves a private or public key to a file. If it's a private key and a password is provided,
-    the key will be encrypted.
+    Converts a private or public key to a PEM string.
 
     Args:
-        key: The key to save (private or public).
-        file_path (str): Path to the file where the key should be saved.
-        password (str): Optional password to encrypt the private key.
+        key: The key to convert (private or public).
+        password (str): The password used to encrypt the key.
     """
     if hasattr(key, 'private_bytes'):
         encoding = serialization.Encoding.PEM
@@ -55,8 +53,40 @@ def save_key(key, file_path: str, password: str = None) -> None:
         format = serialization.PublicFormat.SubjectPublicKeyInfo
         key_data = key.public_bytes(encoding, format)
 
+    return key_data
+
+
+def save_key(key, file_path: str, password: str = None) -> None:
+    """
+    Saves a private or public key to a file. If it's a private key and a password is provided,
+    the key will be encrypted.
+
+    Args:
+        key: The key to save (private or public).
+        file_path (str): Path to the file where the key should be saved.
+        password (str): Optional password to encrypt the private key.
+    """
+    key_data = key_to_pem(key, password)
+
     with open(file_path, "wb") as key_file:
         key_file.write(key_data)
+
+
+def pem_to_private_key(pem_data: str, password: str = None):
+    """
+    Converts a PEM string to a private or public key. If the PEM string is encrypted, a password must be provided.
+
+    Args:
+        pem_data (str): The PEM string to convert.
+        password (str): The password used to encrypt the key.
+    """
+
+    private_key = serialization.load_pem_private_key(
+        pem_data,
+        password=password.encode() if password else None,
+        backend=default_backend()
+    )
+    return private_key
 
 
 def load_private_key(file_path: str, password: str = None):
@@ -71,12 +101,22 @@ def load_private_key(file_path: str, password: str = None):
         The private key.
     """
     with open(file_path, "rb") as key_file:
-        private_key = serialization.load_pem_private_key(
-            key_file.read(),
-            password=password.encode() if password else None,
-            backend=default_backend()
-        )
+        private_key = pem_to_private_key(key_file.read(), password)
     return private_key
+
+
+def pem_to_public_key(pem_data: str):
+    """
+    Converts a PEM string to a public key.
+
+    Args:
+        pem_data (str): The PEM string to convert.
+    """
+    public_key = serialization.load_pem_public_key(
+        pem_data,
+        backend=default_backend()
+    )
+    return public_key
 
 
 def load_public_key(file_path: str):
@@ -90,10 +130,7 @@ def load_public_key(file_path: str):
         The public key.
     """
     with open(file_path, "rb") as key_file:
-        public_key = serialization.load_pem_public_key(
-            key_file.read(),
-            backend=default_backend()
-        )
+        public_key = pem_to_public_key(key_file.read())
     return public_key
 
 
