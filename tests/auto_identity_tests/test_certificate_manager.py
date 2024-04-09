@@ -106,3 +106,21 @@ def test_get_subject_common_name():
 
     # Assert that the common name matches the provided subject name
     assert common_name == subject_name
+
+
+def test_certificate_to_pem_and_back():
+    # Create a private key for testing
+    private_key, _ = key_management.generate_ed25519_key_pair()
+    subject_name = "Test"
+
+    self_issuer = CertificateManager(private_key=private_key)
+    certificate = self_issuer.self_issue_certificate(subject_name)
+    pem_certificate = self_issuer.certificate_to_pem(certificate)
+
+    # Ensure the PEM is bytes
+    assert isinstance(pem_certificate, bytes)
+
+    # Convert the PEM back to a certificate
+    certificate_from_pem = self_issuer.pem_to_certificate(pem_certificate)
+
+    assert certificate == certificate_from_pem
