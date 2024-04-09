@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from cryptography import x509
 from cryptography.x509.oid import NameOID
-from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import ed25519, rsa
 from .key_management import do_public_keys_match
 
@@ -143,6 +143,30 @@ class CertificateManager:
         ).sign(**signing_params)
 
         self.certificate = certificate
+        return certificate
+
+    @staticmethod
+    def certificate_to_pem(certificate: x509.Certificate):
+        """
+        Converts an x509 certificate to PEM format.
+
+        Returns:
+            bytes: PEM encoded certificate.
+        """
+        return certificate.public_bytes(serialization.Encoding.PEM)
+
+    @staticmethod
+    def pem_to_certificate(pem_bytes: bytes) -> x509.Certificate:
+        """
+        Converts PEM bytes to an x509 Certificate object.
+
+        Args:
+            pem_bytes (bytes): The PEM-encoded certificate as bytes.
+
+        Returns:
+            An x509.Certificate object.
+        """
+        certificate = x509.load_pem_x509_certificate(pem_bytes)
         return certificate
 
     @staticmethod

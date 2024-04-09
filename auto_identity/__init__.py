@@ -20,7 +20,7 @@ from .certificate_manager import CertificateManager
 from .registry import Registry
 from .utils import der_encode_signature_algorithm_oid
 
-__version__ = '0.1.3'
+__version__ = '0.1.4'
 
 __all__ = [
     "generate_rsa_key_pair",
