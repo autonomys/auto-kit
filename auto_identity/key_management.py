@@ -34,7 +34,7 @@ def generate_ed25519_key_pair() -> tuple:
     return private_key, public_key
 
 
-def key_to_pem(key, password: str = None) -> str:
+def key_to_pem(key, password: str = None) -> bytes:
     """
     Converts a private or public key to a PEM string.
 
