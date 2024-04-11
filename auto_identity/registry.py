@@ -1,8 +1,13 @@
-from typing import Optional
+from typing import Optional, NamedTuple
 from cryptography import x509
 from cryptography.hazmat.primitives.asymmetric import ed25519
 from substrateinterface import ExtrinsicReceipt, Keypair, SubstrateInterface, exceptions
 from .utils import der_encode_signature_algorithm_oid
+
+
+class RegistrationResult(NamedTuple):
+    receipt: Optional[ExtrinsicReceipt]
+    identifier: Optional[int]
 
 
 class Registry():
@@ -51,7 +56,7 @@ class Registry():
             print("Failed to send: {}".format(e))
             return None
 
-    def register_auto_id(self, certificate: x509.Certificate, issuer_id=None):
+    def register_auto_id(self, certificate: x509.Certificate, issuer_id=None) -> RegistrationResult:
         """
         Register a certificate in the registry.
 
@@ -60,7 +65,8 @@ class Registry():
             issuer_id: The issuer ID. If None, the ID will be self-issued.
 
         Returns:
-            Optional[ExtrinsicReceipt]: The receipt of the extrinsic if successful, None otherwise.
+            RegistrationResult: A named tuple containing the receipt of the extrinsic and the identifier if successful,
+                                or None for both fields if unsuccessful.
         """
 
         base_certificate = {
@@ -82,45 +88,12 @@ class Registry():
 
         receipt = self._compose_call(
             call_function="register_auto_id", call_params=req)
-        return receipt
 
-    def get_auto_id(self, identifier):
-        """
-        Get an auto identity from the registry.
+        if receipt.is_success:
+            for event in receipt.triggered_events:
+                event_data = event['event'].serialize()
+                if event_data.get('event_id') == 'NewAutoIdRegistered':
+                    identifier = event_data['attributes']
+                    return RegistrationResult(receipt=receipt, identifier=identifier)
 
-        Args:
-            subject_name (str): The subject name of the certificate.
-
-        Returns:
-            The auto entity with the provided subject name.
-        """
-
-        result = self.registry.query('auto-id', 'AutoIds', [identifier])
-
-        if result is None:
-            return None
-
-        # TODO map result to AutoEntity type
-        auto_entity = result
-
-        return auto_entity
-
-    def verify(self, subject_name: str, public_key: ed25519.Ed25519PublicKey):
-        """
-        Verify a certificate from the registry.
-
-        Args:
-            subject_name (str): The subject name of the certificate.
-            public_key (ed25519.Ed25519PublicKey): The public key to verify.
-
-        Returns:
-            bool: True if the certificate is valid, False otherwise.
-        """
-        entity = self.get_auto_id(subject_name)
-
-        if entity is None:
-            return False
-
-        # TODO check public key and subject name match certificate, and that it is within the validity period
-
-        return True
+        return RegistrationResult(receipt=receipt, identifier=None)

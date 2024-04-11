@@ -11,16 +11,10 @@ KEYPAIR_URI = os.getenv("KEYPAIR_URI")
 
 def register(certificate, registry, issuer_id=None):
     # Attempt to register the certificate
-    receipt = registry.register_auto_id(certificate, issuer_id)
+    receipt, identifer = registry.register_auto_id(certificate, issuer_id)
     if receipt.is_success:
-        for event in receipt.triggered_events:
-            event_data = event['event'].serialize()
-            print(event_data)
-            if event_data.get('event_id') == 'NewAutoIdRegistered':
-                auto_id_identifier = event_data['attributes']
-                print(
-                    f"New Auto Id registered with identifier: {auto_id_identifier}")
-                return auto_id_identifier
+        print(f"Registration successful. {identifer}")
+        return identifer
     else:
         print("Registration failed.")
 
