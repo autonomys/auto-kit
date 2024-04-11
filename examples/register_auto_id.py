@@ -35,7 +35,11 @@ def main():
     user_cm = CertificateManager(private_key=user_keys[0])
     user_csr = user_cm.create_and_sign_csr("user")
     user_cert = self_issued_cm.issue_certificate(user_csr)
+    CertificateManager.pretty_print_certificate(user_cert)
     register_user = register(user_cert, registry, issuer_id)
+
+    print(
+        f"auto id from cert: {CertificateManager.get_certificate_auto_id(user_cert)}")
 
 
 if __name__ == "__main__":

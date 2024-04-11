@@ -1,5 +1,5 @@
+from hashlib import blake2b
 from cryptography.x509.oid import ObjectIdentifier
-from cryptography.hazmat.primitives import hashes
 from pyasn1.type import namedtype, univ
 from pyasn1.codec.der.encoder import encode
 
@@ -49,6 +49,6 @@ def blake2b_256(data: bytes) -> bytes:
         bytes: The BLAKE2b-256 hash of the data.
 
     """
-    digest = hashes.Hash(hashes.BLAKE2b(32))
-    digest.update(data)
-    return digest.finalize()
+    hasher = blake2b(data, digest_size=32)
+
+    return hasher.digest()
