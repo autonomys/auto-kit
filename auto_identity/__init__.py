@@ -20,7 +20,7 @@ from .certificate_manager import CertificateManager
 from .registry import Registry
 from .utils import der_encode_signature_algorithm_oid, blake2b_256
 
-__version__ = '0.1.5'
+__version__ = '0.1.6'
 
 __all__ = [
     "generate_rsa_key_pair",

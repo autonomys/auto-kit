@@ -207,8 +207,8 @@ class CertificateManager:
                 raise ValueError(
                     "Issuer certificate public key does not match the private key used for signing.")
             issuer_name = self.certificate.subject
-            auto_id = blake2b_256((self.get_subject_common_name(
-                issuer_name)+self.get_subject_common_name(csr.subject)).encode())
+            auto_id = blake2b_256((self.get_certificate_auto_id(
+                self.certificate).encode() + self.get_subject_common_name(csr.subject).encode()))
 
         # Prepare the certificate builder with information from the CSR
         certificate_builder = x509.CertificateBuilder().subject_name(
