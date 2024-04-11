@@ -102,7 +102,7 @@ def test_get_subject_common_name():
     certificate = self_issuer.self_issue_certificate("Test")
 
     # Retrieve the common name from the certificate
-    common_name = self_issuer.get_subject_common_name(certificate)
+    common_name = self_issuer.get_subject_common_name(certificate.subject)
 
     # Assert that the common name matches the provided subject name
     assert common_name == subject_name

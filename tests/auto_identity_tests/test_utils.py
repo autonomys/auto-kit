@@ -1,7 +1,7 @@
 import pathlib
 from cryptography.hazmat.backends import default_backend
 from cryptography import x509
-from auto_identity import der_encode_signature_algorithm_oid
+from auto_identity import der_encode_signature_algorithm_oid, blake2b_256
 
 
 def test_der_encode_algorithm2():
@@ -22,3 +22,10 @@ def test_der_encode_algorithm2():
     # Compare the DER encoded OID with the result from tests in https://github.com/subspace/subspace/blob/d875a5aac35c1732eec61ce4359782eff58ff6fc/domains/pallets/auto-id/src/tests.rs#L127
     from_rust_implementation = "300d06092a864886f70d01010b0500"
     assert (der_encoded_oid.hex() == from_rust_implementation)
+
+
+def test_blake2b_256():
+    data = b"Hello, world!"
+    hash = blake2b_256(data)
+    expected_hash = "b5da441cfe72ae042ef4d2b17742907f675de4da57462d4c3609c2e2ed755970"
+    assert hash.hex() == expected_hash

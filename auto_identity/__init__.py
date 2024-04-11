@@ -18,9 +18,9 @@ from .key_management import (
     save_key)
 from .certificate_manager import CertificateManager
 from .registry import Registry
-from .utils import der_encode_signature_algorithm_oid
+from .utils import der_encode_signature_algorithm_oid, blake2b_256
 
-__version__ = '0.1.4'
+__version__ = '0.1.5'
 
 __all__ = [
     "generate_rsa_key_pair",
@@ -34,6 +34,7 @@ __all__ = [
     "key_to_pem",
     "CertificateManager",
     "der_encode_signature_algorithm_oid",
+    "blake2b_256",
     "Registry",
     "Keypair",
 ]

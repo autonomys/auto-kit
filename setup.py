@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='auto-sdk',
-    version='0.1.4',
+    version='0.1.5',
     author='Autonomys',
     author_email='jeremy@subspace.network',
     url='https://github.com/subspace/auto-kit',
