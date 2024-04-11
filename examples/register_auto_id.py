@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from auto_identity import generate_ed25519_key_pair, self_issue_certificate, Registry, Keypair
+from auto_identity import generate_ed25519_key_pair, CertificateManager, Registry, Keypair
 
 
 # Configuration
@@ -18,7 +18,8 @@ def main():
     registry = Registry(rpc_url=RPC_URL, signer=keypair)
 
     keys = generate_ed25519_key_pair()
-    certificate = self_issue_certificate("test", private_key=keys[0])
+    cm = CertificateManager(private_key=keys[0])
+    certificate = cm.self_issue_certificate("test")
 
     # Attempt to register the certificate
     receipt = registry.register_auto_id(certificate)
