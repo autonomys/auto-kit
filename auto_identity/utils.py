@@ -1,3 +1,4 @@
+from hashlib import blake2b
 from cryptography.x509.oid import ObjectIdentifier
 from pyasn1.type import namedtype, univ
 from pyasn1.codec.der.encoder import encode
@@ -35,3 +36,19 @@ def der_encode_signature_algorithm_oid(oid: ObjectIdentifier):
 
     der_encoded_oid = encode(algorithm_identifier)
     return der_encoded_oid
+
+
+def blake2b_256(data: bytes) -> bytes:
+    """
+    Hashes the given data using BLAKE2b-256.
+
+    Args:
+        data (bytes): The data to be hashed.
+
+    Returns:
+        bytes: The BLAKE2b-256 hash of the data.
+
+    """
+    hasher = blake2b(data, digest_size=32)
+
+    return hasher.digest()

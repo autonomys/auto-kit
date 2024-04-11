@@ -13,7 +13,7 @@ def test_create_csr():
     csr_creator = CertificateManager(private_key=private_key)
 
     # Call the create_csr function
-    csr = csr_creator.create_csr(subject_name)
+    csr = csr_creator.create_and_sign_csr(subject_name)
 
     # Assert that the CSR is not None
     assert csr is not None
@@ -43,7 +43,7 @@ def test_issue_certificate():
 
     csr_creator = CertificateManager(private_key=subject_private_key)
     # Call the create_csr function to generate a CSR
-    csr = csr_creator.create_csr(subject_name)
+    csr = csr_creator.create_and_sign_csr(subject_name)
 
     # Issue a certificate using the CSR
     certificate = issuer.issue_certificate(csr)
@@ -102,7 +102,7 @@ def test_get_subject_common_name():
     certificate = self_issuer.self_issue_certificate("Test")
 
     # Retrieve the common name from the certificate
-    common_name = self_issuer.get_subject_common_name(certificate)
+    common_name = self_issuer.get_subject_common_name(certificate.subject)
 
     # Assert that the common name matches the provided subject name
     assert common_name == subject_name
