@@ -23,7 +23,7 @@ class CertificateManager:
         self.private_key = private_key
         self.certificate = certificate
 
-    def _prepare_signing_params(self):
+    def _prepare_signing_params(self) -> dict:
         """
         Prepares the signing parameters based on the key type.
 
@@ -39,7 +39,7 @@ class CertificateManager:
         raise ValueError("Unsupported key type for signing.")
 
     @staticmethod
-    def _to_common_name(subject_name):
+    def _to_common_name(subject_name) -> x509.Name:
         """
         Converts a subject name to a common name.
 
@@ -47,7 +47,7 @@ class CertificateManager:
             subject_name(str): Subject name for the certificate(common name).
 
         Returns:
-            str: Common name.
+            x509.Name: Common name.
         """
         return x509.Name([x509.NameAttribute(NameOID.COMMON_NAME, subject_name)])
 
@@ -80,7 +80,7 @@ class CertificateManager:
         ).decode('utf-8'))
 
     @staticmethod
-    def certificate_to_pem(certificate: x509.Certificate):
+    def certificate_to_pem(certificate: x509.Certificate) -> bytes:
         """
         Converts an x509 certificate to PEM format.
 
@@ -104,7 +104,7 @@ class CertificateManager:
         return certificate
 
     @staticmethod
-    def get_subject_common_name(subject: x509.Name):
+    def get_subject_common_name(subject: x509.Name) -> str:
         """
         Retrieves the common name from the subject of the certificate.
 
@@ -117,7 +117,7 @@ class CertificateManager:
         return subject.get_attributes_for_oid(NameOID.COMMON_NAME)[0].value
 
     @staticmethod
-    def get_certificate_auto_id(certificate: x509.Certificate):
+    def get_certificate_auto_id(certificate: x509.Certificate) -> str:
         """
         Retrieves the autoid from the certificate.
 
@@ -134,7 +134,7 @@ class CertificateManager:
                 return name.value.split(":")[-1]
 
     @staticmethod
-    def create_csr(subject_name):
+    def create_csr(subject_name) -> x509.CertificateSigningRequest:
         """
         Creates an unsigned Certificate Signing Request(CSR).
 
@@ -152,7 +152,7 @@ class CertificateManager:
 
         return csr
 
-    def sign_csr(self, csr):
+    def sign_csr(self, csr) -> x509.CertificateSigningRequest:
         """
         Signs a Certificate Signing Request(CSR).
 
@@ -169,7 +169,7 @@ class CertificateManager:
 
         return csr.sign(**signing_params)
 
-    def create_and_sign_csr(self, subject_name):
+    def create_and_sign_csr(self, subject_name) -> x509.CertificateSigningRequest:
         """
         Creates and signs a Certificate Signing Request(CSR).
 
@@ -182,7 +182,7 @@ class CertificateManager:
         csr = self.create_csr(subject_name)
         return self.sign_csr(csr)
 
-    def issue_certificate(self, csr: x509.CertificateSigningRequest, validity_period_days=365):
+    def issue_certificate(self, csr: x509.CertificateSigningRequest, validity_period_days=365) -> x509.Certificate:
         """
         Issues a certificate for Certificate Signing Request(CSR).
 
@@ -250,7 +250,7 @@ class CertificateManager:
 
         return certificate
 
-    def self_issue_certificate(self, subject_name: str, validity_period_days=365):
+    def self_issue_certificate(self, subject_name: str, validity_period_days=365) -> x509.Certificate:
         """
         Issues a self-signed certificate for the identity.
 
