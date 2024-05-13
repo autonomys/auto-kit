@@ -1,6 +1,7 @@
 from auto_identity import CertificateManager, key_management
 from cryptography import x509
 from cryptography.x509.oid import NameOID
+from auto_identity import blake2b_256
 
 
 def test_create_csr():
@@ -124,3 +125,26 @@ def test_certificate_to_pem_and_back():
     certificate_from_pem = self_issuer.pem_to_certificate(pem_certificate)
 
     assert certificate == certificate_from_pem
+
+def test_auto_id_deterministic():
+    # Create a private key for testing
+    private_key, _ = key_management.generate_ed25519_key_pair()
+    subject_name = "Test"
+
+    self_issuer = CertificateManager(private_key=private_key)
+    certificate = self_issuer.self_issue_certificate(subject_name)
+    pem_certificate = self_issuer.certificate_to_pem(certificate)
+
+    # Ensure the PEM is bytes
+    assert isinstance(pem_certificate, bytes)
+
+    issuer_auto_id = CertificateManager.get_certificate_auto_id(certificate)
+    assert issuer_auto_id == blake2b_256(self_issuer.get_subject_common_name(certificate.subject).encode()).hex()
+    assert issuer_auto_id == "8d2143d76615c515b5cc88fa7806aef268edeea87571c8f8b21a19f77b9993ba"
+
+    # for child certificate, auto_id of the issuer is included in the data
+    child_certificate = self_issuer.issue_certificate(self_issuer.create_and_sign_csr("child"))
+
+    assert CertificateManager.get_certificate_auto_id(child_certificate) == blake2b_256(CertificateManager.get_certificate_auto_id(
+                certificate).encode() + self_issuer.get_subject_common_name(child_certificate.subject).encode()).hex()
+    assert CertificateManager.get_certificate_auto_id(child_certificate) == "d1575259a7e413f51e24ece5e353f5015fb0e39e6738b2044a3d7a8c3bc11114"
